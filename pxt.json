@@ -1,0 +1,35 @@
+{
+    "name": "HaodaBit",
+    "version": "0.3.1",
+    "description": "Extension for HaodaBit",
+    "license": "MIT",
+    "dependencies": {
+        "core": "*",
+        "neopixel": "github:kittenbot/pxt-neopixel#v0.6.13"
+    },
+    "files": [
+        "README.md",
+        "main.ts",
+		"enums.d.ts",
+		"main.cpp",
+        "ir.cpp",
+		"SSD1306_OLED.cpp",
+        "ReceiverIR.cpp",
+        "ReceiverIR.h",
+        "RemoteIR.h",
+		"TransmitterIR.cpp",
+        "TransmitterIR.h",
+		"Adafruit_SSD1306.h",
+        "Adafruit_SSD1306.cpp",
+        "Adafruit_GFX.h",
+        "Adafruit_GFX.cpp",
+        "Adafruit_GFX_Config.h",
+        "glcdfont.h",
+        "_locales/zh/HaodaBit-strings.json"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "public": true,
+    "preferredEditor": "tsprj"
+}
