@@ -33,8 +33,6 @@
 	"HaodaBit.PowerOn|block": "BMP280 打开",
 	"HaodaBit.PowerOff|block": "BMP280 关闭",
 	"HaodaBit.Address|block": "BMP280设置地址 %addr",
-	"HaodaBit.temperature|block": "BMP280 获取温度值",
-	"HaodaBit.temperature|block": "BMP280 获取温度值",
 	"HaodaBit.MotorRun|block": "电机|%index|方向|%Dir|速度|%speed",
 	"HaodaBit.motorStop|block": "电机停止|%index",
     "HaodaBit.motorStopAll|block": "停止所有电机"
