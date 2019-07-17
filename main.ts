@@ -7,6 +7,7 @@ load dependency
 
 
 //% weight=10 color=#006000 icon="\uf013" block="HaodaBit"
+//% groups='["Ultrasonic", "Linefollower", "Environment", "Actuator", "IR", "Mp3", "RGB", "BMP280"]'
 namespace HaodaBit {
     const MM32_ADDRESS = 0x40
     const MODE1 = 0x00
