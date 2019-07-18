@@ -35,5 +35,10 @@
 	"HaodaBit.Address|block": "BMP280设置地址 %addr",
 	"HaodaBit.MotorRun|block": "电机|%index|方向|%Dir|速度|%speed",
 	"HaodaBit.motorStop|block": "电机停止|%index",
-    "HaodaBit.motorStopAll|block": "停止所有电机"
+    "HaodaBit.motorStopAll|block": "停止所有电机",
+	"HaodaBit.Lineheight|block": "设置巡线传感器|%pn|高度比较值|%heights",
+    "HaodaBit.readlinead|block": "读巡线传感器|%li|遇到黑线时高度值",
+	"HaodaBit.readline|block": "巡线传感器|%li 是否遇到黑线",
+	"HaodaBit.Ultrasonic|group": "超声波"
+	
 }

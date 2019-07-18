@@ -7,7 +7,7 @@ load dependency
 
 
 //% weight=10 color=#006000 icon="\uf013" block="HaodaBit"
-//% groups='["Ultrasonic", "Linefollower", "Environment", "Actuator", "IR", "Mp3", "RGB", "BMP280"]'
+
 namespace HaodaBit {
     const MM32_ADDRESS = 0x40
     const MODE1 = 0x00
@@ -127,6 +127,39 @@ namespace HaodaBit {
         Humidity = 2
     }
 	
+	export enum linechoose {
+        //% block=R1
+        R1 = 0x19,
+        //% block=R2
+        R2 = 0x16,
+        //% block=L1
+        L1 = 0x14,
+        //% block=L2
+        L2 = 0x13
+    }
+	
+	export enum linechooseAD {
+        //% block=R1
+        R1 = 0x07,
+        //% block=R2
+        R2 = 0x09,
+        //% block=L1
+        L1 = 0x05,
+        //% block=L2
+        L2 = 0x03
+    }
+	
+	export enum linechoosedb {
+        //% block=R1
+        R1 = 0x0f,
+        //% block=R2
+        R2 = 0x11,
+        //% block=L1
+        L1 = 0x0d,
+        //% block=L2
+        L2 = 0x0b
+    }
+	
 	export enum PrevNext {
         //% block=play
         play = 0x0d,
@@ -157,6 +190,7 @@ namespace HaodaBit {
     //% block="0x77"
     ADDR_0x77 = 0x77
    }
+   
    export enum Motors {
         //%blockId=HaodaBit_motordriver_motor_one
         //% block="MA"
@@ -881,5 +915,58 @@ namespace HaodaBit {
             motorStop(idx);
         }
     }
+	
+	
+	//% blockId="HaodaBit_set_height" block="set Tracer|%pn|height|%heights"
+    //% weight=90
+    //% group="Linefollower" weight=50
+    export function Lineheight(pn: linechoosedb, heights: number): void {
+		
+		
+/**	
+		
+		
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x03, N76E003AT20_DATA1, N76E003AT20_DATA2);
+		
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x05, N76E003AT20_DATA1, N76E003AT20_DATA2);
+
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x07, N76E003AT20_DATA1, N76E003AT20_DATA2);
+
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x09, N76E003AT20_DATA1, N76E003AT20_DATA2);
+
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x13, N76E003AT20_DATA1, N76E003AT20_DATA2);
+
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x14, N76E003AT20_DATA1, N76E003AT20_DATA2);
+
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x19, N76E003AT20_DATA1, N76E003AT20_DATA2);
+
+		i2cWrite_1(N76E003AT20_ADDRESS, 0x16, N76E003AT20_DATA1, N76E003AT20_DATA2);
+*/
+		
+	
+	
+		i2cWrite(N76E003AT20_ADDRESS, pn, heights);
+
+
+
+    }
+	
+	//% blockId="HaodaBit_read_linead" block="read Tracer|%li|touch black"
+    //% weight=90
+    //% group="Linefollower" weight=50
+	export function readlinead(li: linechooseAD): number { 
+	     let values = i2cRead(N76E003AT20_ADDRESS, li);
+		 return values;
+
+	}
+	
+	//% blockId="HaodaBit_read_line" block="Tracer|%li touch black or not"
+    //% weight=90
+    //% group="Linefollower" weight=50
+	export function readline(li: linechoose): number { 
+	     let values = i2cRead(N76E003AT20_ADDRESS, li);
+		 return values;
+
+	}
 
 }
