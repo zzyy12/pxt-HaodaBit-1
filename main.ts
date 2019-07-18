@@ -5,7 +5,7 @@ load dependency
 "HaodaBit": "file:../pxt-HaodaBit"
 */
 /**
-//% groups='["Sensor", "Display", "Actuator"]'
+//% groups='["传感器", "显示", "执行","音乐"]'
 */
 //% weight=10 color=#006000 icon="\uf0a4" block="HaodaBit"
 
@@ -318,7 +318,7 @@ namespace HaodaBit {
 
     //% blockId=HaodaBit_ultrasonic block="Ultrasonic|port %pin"
     //% weight=10
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
     export function Ultrasonic(pin: Ports): number {
 
         // send pulse
@@ -345,7 +345,7 @@ namespace HaodaBit {
 	
 	//% blockId=IR_read block="read IR %pin"
     //% weight=100
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function IR_read(pin: Ports): number {
         haodabitInit(pin)
         return getParam()
@@ -353,7 +353,7 @@ namespace HaodaBit {
 
     //% blockId=IR_KEY block="IR buttons| %readkey"
     //% weight=100
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function key_read(readkey: Buttondd): number {
         return readkey;
     }
@@ -361,7 +361,7 @@ namespace HaodaBit {
 	
 	//% blockId=HaodaBit_dht11 block="DHT11|port %port|type %readtype"
     //% weight=60
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
     export function DHT11(readtype: DHT11Type, port: Ports1): number {
 
         let pin = PortDigital[port]
@@ -390,7 +390,7 @@ namespace HaodaBit {
     //% weight=100
     //% block="initialize OLED with height %height|width %width"
     //% shim=OLED::init_terminal
-	//% group="Display" blockGap=40
+	//% group="显示" blockGap=40
 	
     export function init(height: number = 64, width: number = 128): void {
         return;
@@ -403,7 +403,7 @@ namespace HaodaBit {
     //% block="insert newline"
     //% async
     //% shim=OLED::NextLine
-	//% group="Display" blockGap=40
+	//% group="显示" blockGap=40
     export function nextLine(): void {
         return;
     }
@@ -416,7 +416,7 @@ namespace HaodaBit {
     //% block="clear OLED display"
     //% icon="\uf1ec" 
     //% shim=OLED::clearDisplay
-	//% group="Display" blockGap=40
+	//% group="显示" blockGap=40
     export function clear(): void {
         return;
     }
@@ -430,7 +430,7 @@ namespace HaodaBit {
      //% blockId=oled_print_stringNoNewLine
      //% icon="\uf1ec"
      //% shim=OLED::showStringNoNewLine
-	 //% group="Display" blockGap=40
+	 //% group="显示" blockGap=40
      export function showStringNoNewLine(text: string): void {
         console.log("display: " + text);
         return;
@@ -460,7 +460,7 @@ namespace HaodaBit {
     //% block="show|number %number" 
     //% async 
     //% shim=OLED::showNumberWithoutNewLine
-	//% group="Display" blockGap=40
+	//% group="显示" blockGap=40
     export function showNumberNoNewLine(number: number): void {
         console.log("display: " + number);
         return;
@@ -469,7 +469,7 @@ namespace HaodaBit {
 	
 	//% blockId=HaodaBit_mp3_connect block="MP3 init|port %port"
     //% weight=39
-	//% group="Actuator" blockGap=40
+	//% group="音乐" blockGap=40
 	
     export function MP3Connect(port: Ports): void {
         let pin = PortSerial[port]
@@ -479,7 +479,7 @@ namespace HaodaBit {
 
     //% blockId=HaodaBit_mp3_play block="MP3 |%pn"
 	//% weight=39
-    //% group="Actuator" blockGap=40
+    //% group="音乐" blockGap=40
     export function MP3Play(pn: PrevNext): void {
         let buf = pins.createBuffer(8);
         buf[0] = 0x7e;
@@ -497,7 +497,7 @@ namespace HaodaBit {
     //% volumn.min=0 volumn.max=30
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     //% weight=39
-    //% group="Actuator" blockGap=40
+    //% group="音乐" blockGap=40
     export function MP3Volumn(volumn: number): void {
         let buf = pins.createBuffer(8);
         buf[0] = 0x7e;
@@ -513,7 +513,7 @@ namespace HaodaBit {
 
     //% blockId=HaodaBit_mp3_playindex block="MP3 play|index %index"
     //% weight=39
-    //% group="Actuator" blockGap=40
+    //% group="音乐" blockGap=40
     export function MP3PlayIndex(index: number): void {
         let buf = pins.createBuffer(8);
         if (index == 0) {
@@ -533,7 +533,7 @@ namespace HaodaBit {
 	//% blockId=HaodaBit_motor_servo block="Servo|%pin|degree|%degree"
     //% weight=100 blockGap=40
     //% degree.min=0 degree.max=180
-    //% group="Actuator" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
 	
     export function servo(pin: Ports, degree: number): void {
 
@@ -545,7 +545,7 @@ namespace HaodaBit {
 	
 	//% blockId=HaodaBit_LM35_server block="read lm35|port %pin"
     //% weight=100
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
     export function server_lm35(pin: Ports1): number {
 
         let port = PortAnalog[pin]
@@ -642,7 +642,7 @@ namespace HaodaBit {
 
     //% blockId=HaodaBit_TCS34725 block="read color|port %pn"
     //% weight=100
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
     export function H_TCS34725(pn: Creadcolor): number {
         let num = TCS34725_readRGBC(pn);
         return num;
@@ -707,7 +707,7 @@ namespace HaodaBit {
      */
     //% blockId=HaodaBit_sendMyMessage block="IR send message at: %msg|, %times| times,port %port"
     //% weight=100
-	//% group="Actuator" blockGap=40
+	//% group="执行" blockGap=40
   export function sendMyMessage(msg: number, times: number, port: Ports): void {
 	  	let portss = PortAnalog[port]
         irLed = portss;
@@ -788,7 +788,7 @@ namespace HaodaBit {
      */
     //% blockId="BMP280_GET_PRESSURE" block="BMP280 get pressure"
     //% weight=80
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function pressure(): number {
         get();
         return P;
@@ -799,7 +799,7 @@ namespace HaodaBit {
     */
     //% blockId="BMP280_GET_TEMPERATURE" block="BMP280 get temperature"
     //% weight=80
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function temperature(): number {
         get();
         return T;
@@ -810,7 +810,7 @@ namespace HaodaBit {
     */
     //% blockId="BMP280_POWER_ON" block="BMP280 power On"
     //% weight=80 
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function PowerOn() {
         setreg(0xF4, 0x2F)
     } 
@@ -820,7 +820,7 @@ namespace HaodaBit {
      */
     //% blockId="BMP280_POWER_OFF" block="BMP280 power Off"
     //% weight=80 
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function PowerOff() {
         setreg(0xF4, 0)
     }
@@ -830,7 +830,7 @@ namespace HaodaBit {
      */
     //% blockId="BMP280_SET_ADDRESS" block="BMP280 set address %addr"
     //% weight=80
-	//% group="Sensor" blockGap=40
+	//% group="传感器" blockGap=40
     export function Address(addr: BMP280_I2C_ADDRESS) {
         BMP280_I2C_ADDR = addr
     }
@@ -881,7 +881,7 @@ namespace HaodaBit {
     //% speed.min=0 speed.max=255
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
     //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
-    //% group="Actuator" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     export function MotorRun(index: Motors, direction: Dir, speed: number): void {
         if (!initialized) {
             MM32DDDD()
@@ -909,7 +909,7 @@ namespace HaodaBit {
     //% weight=20 blockGap=40
     //% blockId=HaodaBit_motorStop block="Motor stop|%index"
     //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2 
-    //% group="Actuator" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     export function motorStop(index: Motors) {
         setPwm((4 - index) * 2, 0, 0);
         setPwm((4 - index) * 2 + 1, 0, 0);
@@ -920,7 +920,7 @@ namespace HaodaBit {
     */
     //% weight=10 blockGap=40
     //% blockId=HaodaBit_motorStopAll block="Motor Stop All"
-    //% group="Actuator" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     export function motorStopAll(): void {
         for (let idx = 1; idx <= 2; idx++) {
             motorStop(idx);
@@ -930,7 +930,7 @@ namespace HaodaBit {
 	
 	//% blockId="HaodaBit_set_height" block="set Tracer|%pn|height|%heights"
     //% weight=90
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
     export function Lineheight(pn: linechoosedb, heights: number): void {
 		
 		
@@ -964,7 +964,7 @@ namespace HaodaBit {
 	
 	//% blockId="HaodaBit_read_linead" block="read Tracer|%li|touch black"
     //% weight=90
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
 	export function readlinead(li: linechooseAD): number { 
 	     let values = i2cRead(N76E003AT20_ADDRESS, li);
 		 return values;
@@ -973,7 +973,7 @@ namespace HaodaBit {
 	
 	//% blockId="HaodaBit_read_line" block="Tracer|%li|touch black or not"
     //% weight=90
-    //% group="Sensor" blockGap=40
+    //% group="传感器" blockGap=40
 	export function readline(li: linechoose): number { 
 	     let values = i2cRead(N76E003AT20_ADDRESS, li);
 		 return values;
