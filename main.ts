@@ -7,7 +7,7 @@ load dependency
 /**
 //% groups='["Sensor", "Display", "Actuator"]'
 */
-//% weight=10 color=#006000 icon="\uf013" block="HaodaBit"
+//% weight=10 color=#006000 icon="\uf5d0" block="HaodaBit"
 
 namespace HaodaBit {
     const MM32_ADDRESS = 0x40
