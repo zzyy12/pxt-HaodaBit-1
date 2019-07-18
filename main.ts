@@ -960,7 +960,7 @@ namespace HaodaBit {
 
 	}
 	
-	//% blockId="HaodaBit_read_line" block="Tracer|%li touch black or not"
+	//% blockId="HaodaBit_read_line" block="Tracer|%li|touch black or not"
     //% weight=90
     //% group="Linefollower" weight=50
 	export function readline(li: linechoose): number { 
