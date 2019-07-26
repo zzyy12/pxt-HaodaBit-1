@@ -678,23 +678,29 @@ namespace HaodaBit {
             trueHigh = 560,
             trueLow = 1690,
             falseHigh = 560,
-            falseLow = 560
+            falseLow = 560,
+            interval = 110000
         }
-        //let address = Math.idiv(message, 0x010000)
         let address = message >> 16;
         let command = message % 0x010000;
         const MESSAGE_BITS = 16;
+        let startTime = 0;
+        let betweenTime = 0;
         for (let sendCount = 0; sendCount < times; sendCount++) {
+            startTime = input.runningTimeMicros();
             transmitBit(NEC.startHigh, NEC.startLow);
             encode(address, 16, NEC.trueHigh, NEC.trueLow, NEC.falseHigh, NEC.falseLow);
             encode(command, 16, NEC.trueHigh, NEC.trueLow, NEC.falseHigh, NEC.falseLow);
             transmitBit(NEC.stopHigh, NEC.stopLow);
-            if (times > 1)
-                control.waitMicros(19900);
+            betweenTime = input.runningTimeMicros() - startTime
+            if (times > 0)
+                control.waitMicros(NEC.interval - betweenTime);
         }
     }
 
-     function sendMessage(message: number, times: number, myType: encodingType): void {
+
+
+    export function sendMessage(message: number, times: number, myType: encodingType): void {
         switch (myType) {
             case encodingType.NEC: sendNEC(message, times);
             default: sendNEC(message, times);
