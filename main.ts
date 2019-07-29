@@ -701,36 +701,17 @@ namespace HaodaBit {
 
 
     export function sendMessage(message: number, times: number, myType: encodingType): void {
-        switch (myType) {
-            case encodingType.NEC: sendNEC(message, times);
-            default: sendNEC(message, times);
+       if(myType = encodingType.NEC) {
+           sendNEC(message, times);
+            
         }
     }
 	    
-	//% blockId=setIR_pin block="set IR LED pin: %myPin" blockExternalInputs=false
-    //% weight=90 blockGap=10
-    //% myPin.fieldEditor="gridpicker" myPin.fieldOptions.columns=4
-    //% myPin.fieldOptions.tooltips="false" myPin.fieldOptions.width="300"
-    export function setIR_pin(myPin: AnalogPin) {
-        irLed = myPin;
-        pins.analogWritePin(irLed, 0);
-        pins.analogSetPeriod(irLed, pwmPeriod);
-        initddd = true;
-    }
-	
-	 //% blockId=sendMyMessage1 block="send message: %msg| ,%times| times, encoding type:%myType"
-    //% weight=80 blockGap=10
-    export function sendMyMessage1(msg: number, times: number, myType: encodingType): void {
-        if (initddd) {
-            //control.inBackground(() => {
-            sendMessage(msg, times, myType);
-            //})
-        }
-    }
+
 	
 	 /**
      * send message from IR LED. You must set the message encoding type, send how many times, and the message.
-     
+     */
     //% blockId=HaodaBit_sendMyMessage block="IR send message at: %msg|, %times| times,port %port"
     //% weight=100
 	//% group="执行" blockGap=40
@@ -745,7 +726,7 @@ namespace HaodaBit {
                 sendMessage(msg, times, encodingType.NEC);
             //})
         }
-    }*/
+    }
 	
 	
 	function setreg(reg: number, dat: number): void {
