@@ -701,9 +701,9 @@ namespace HaodaBit {
 
 
     export function sendMessage(message: number, times: number, myType: encodingType): void {
-       if(myType = encodingType.NEC) {
-           sendNEC(message, times);
-            
+        switch (myType) {
+            case encodingType.NEC: sendNEC(message, times);
+            default: sendNEC(message, times);
         }
     }
 	    
