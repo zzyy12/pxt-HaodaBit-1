@@ -214,39 +214,39 @@ namespace HaodaBit {
 	
 	export enum Buttondd {
         //% block=0
-        IR_BUTTON_0 = 0x0d,
+        IR_BUTTON_0 = 0x4f,
         //% block=1
-        IR_BUTTON_1 = 0x00,
+        IR_BUTTON_1 = 0xff,
         //% block=2
-        IR_BUTTON_2 = 0x01,
+        IR_BUTTON_2 = 0x7f,
         //% block=3
-        IR_BUTTON_3 = 0x02,
+        IR_BUTTON_3 = 0xbf,
         //% block=4
-        IR_BUTTON_4 = 0x04,
+        IR_BUTTON_4 = 0xdf,
         //% block=5
-        IR_BUTTON_5 = 0x05,
+        IR_BUTTON_5 = 0x5f,
         //% block=6
-        IR_BUTTON_6 = 0x06,
+        IR_BUTTON_6 = 0x9f,
         //% block=7
-        IR_BUTTON_7 = 0x08,
+        IR_BUTTON_7 = 0xef,
         //% block=8
-        IR_BUTTON_8 = 0x09,
+        IR_BUTTON_8 = 0x6f,
         //% block=9
-        IR_BUTTON_9 = 0x0a,
+        IR_BUTTON_9 = 0xaf,
         //% block=OK
-        IR_BUTTON_OK = 0x15,
+        IR_BUTTON_OK = 0x57,
         //% block=UP
-        IR_BUTTON_UP = 0x11,
+        IR_BUTTON_UP = 0x77,
         //% block=DOWM
-        IR_BUTTON_DOWN = 0x19,
+        IR_BUTTON_DOWN = 0x67,
         //% block=LEFT
-        IR_BUTTON_LEFT = 0x14,
+        IR_BUTTON_LEFT = 0xd7,
         //% block=RIGHT
-        IR_BUTTON_RIGHT = 0x16,
+        IR_BUTTON_RIGHT = 0x97,
         //% block=*
-        IR_BUTTON_SPARK = 0x0c,
+        IR_BUTTON_SPARK = 0xcf,
         //% block=#
-        IR_BUTTON_POUND = 0x0e
+        IR_BUTTON_POUND = 0x8f
 
     }
 
@@ -361,8 +361,9 @@ namespace HaodaBit {
     //% blockId=setREC_pin block="set IR receiver pin: %myPin" 
     //% weight=85 
 	//% group="传感器" blockGap=40
-    export function setREC_pin(myPin: DigitalPin) {
-        recPin = myPin;
+    export function setREC_pin(myPin: Ports) {
+		let portaa = PortDigital[myPin]
+        recPin = portaa;
         pins.setEvents(recPin, PinEventType.Pulse)
         pins.setPull(recPin, PinPullMode.PullUp)
         pins.onPulsed(recPin, PulseValue.Low, function () {
@@ -464,7 +465,7 @@ namespace HaodaBit {
     //% blockId=getMessage block="read IR"
     //% weight=60 
 	//% group="传感器" blockGap=40
-    export function getMessage(handler: Action): number {
+    export function getMessage(): number {
 
         return command1
     }
@@ -826,23 +827,31 @@ namespace HaodaBit {
         }
     }
 	    
-
-	
-	 /**
-     * send message from IR LED. You must set the message encoding type, send how many times, and the message.
+    /**
+     *  set the infrared LED pin.
      */
-    //% blockId=HaodaBit_sendMyMessage block="IR send message at: %msg|, %times| times,port %port"
-    //% weight=100
+    //% blockId=setIR_pin block="set IR LED pin: %port" 
+    //% weight=90 
 	//% group="执行" blockGap=40
-  export function sendMyMessage(msg: number, times: number, port: Ports): void {
-	  	let portss = PortAnalog[port]
+
+    export function setIR_pin(port: Ports) {
+		let portss = PortAnalog[port]
         irLed = portss;
         pins.analogWritePin(irLed, 0);
         pins.analogSetPeriod(irLed, pwmPeriod);
         send_init = true;
+    }
+	
+	 /**
+     * send message from IR LED. You must set the message encoding type, send how many times, and the message.
+     */
+    //% blockId=HaodaBit_sendMyMessage block="IR send message at: %msg"
+    //% weight=100
+	//% group="执行" blockGap=40
+  export function sendMyMessage(msg: number): void {
         if (send_init) {
             //control.inBackground(() => {
-                sendMessage(msg, times, encodingType.NEC);
+                sendMessage(msg, 1, encodingType.NEC);
             //})
         }
     }
