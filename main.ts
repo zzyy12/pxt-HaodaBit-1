@@ -5,7 +5,7 @@ load dependency
 "HaodaBit": "file:../pxt-HaodaBit"
 */
 /**
-//% groups='["传感器", "显示", "执行","音乐"]'
+//% groups='["传感器", "显示", "执行","红外","音乐"]'
 */
 //% weight=10 color=#006000 icon="\uf0a4" block="HaodaBit"
 
@@ -279,31 +279,7 @@ namespace HaodaBit {
     function dht11Update(pin: number): number {
         return 999;
     }
-	
-	//% advanced=true shim=Mbit_IR::initIR
-    function initIR(pin: Pins): void {
-        return
-    }
-    //% advanced=true shim=Mbit_IR::onPressEvent
-    function onPressEvent(btn: RemoteButton, body: Action): void {
-        return
-    }
-    //% advanced=true shim=Mbit_IR::getParam
-    function getParam(): number {
-        return 0
-    }
 
-    function haodabitInit(pin: number): void {
-        let ppo = Ports2[pin];
-        if (alreadyInit == 1) {
-            return
-        }
-        initIR(ppo)
-        alreadyInit = 1
-    }
-	
-	
-	
 	
 	function i2cWrite(addr: number, reg: number, value: number) {
         let buf = pins.createBuffer(2)
@@ -360,7 +336,7 @@ namespace HaodaBit {
      */
     //% blockId=setREC_pin block="set IR receiver pin: %myPin" 
     //% weight=85 
-	//% group="传感器" blockGap=40
+	//% group="红外" blockGap=40
     export function setREC_pin(myPin: Ports) {
 		let portaa = PortDigital[myPin]
         recPin = portaa;
@@ -452,7 +428,7 @@ namespace HaodaBit {
      */
     //% blockId=onReceivedIR block="on IR message received" blockInlineInputs=true
     //% weight=70 
-	//% group="传感器" blockGap=40
+	//% group="红外" blockGap=40
     export function onReceivedIR(handler: Action): void {
         tempHandler = handler
         thereIsHandler = true
@@ -464,7 +440,7 @@ namespace HaodaBit {
      */
     //% blockId=getMessage block="read IR"
     //% weight=60 
-	//% group="传感器" blockGap=40
+	//% group="红外" blockGap=40
     export function getMessage(): number {
 
         return command1
@@ -473,7 +449,7 @@ namespace HaodaBit {
 
     //% blockId=IR_KEY block="IR buttons| %readkey"
     //% weight=100
-	//% group="传感器" blockGap=40
+	//% group="红外" blockGap=40
     export function key_read(readkey: Buttondd): number {
         return readkey;
     }
@@ -832,7 +808,7 @@ namespace HaodaBit {
      */
     //% blockId=setIR_pin block="set IR LED pin: %port" 
     //% weight=90 
-	//% group="执行" blockGap=40
+	//% group="红外" blockGap=40
 
     export function setIR_pin(port: Ports) {
 		let portss = PortAnalog[port]
@@ -847,7 +823,7 @@ namespace HaodaBit {
      */
     //% blockId=HaodaBit_sendMyMessage block="IR send message at: %msg"
     //% weight=100
-	//% group="执行" blockGap=40
+	//% group="红外" blockGap=40
   export function sendMyMessage(msg: number): void {
         if (send_init) {
             //control.inBackground(() => {
