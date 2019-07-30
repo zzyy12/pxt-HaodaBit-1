@@ -171,9 +171,9 @@ namespace HaodaBit {
         //% block=stop
         stop = 0x0e,
         //% block=next
-        next = 0x01,
+        next = 0x02,
         //% block=prev
-        prev = 0x02
+        prev = 0x01
     }
 	
 	export enum Creadcolor {
