@@ -1076,8 +1076,7 @@ namespace HaodaBit {
 	//% blockId="HaodaBit_read_linead" block="read Tracer|%li|touch black"
     //% weight=90
     //% group="传感器" blockGap=8
-	export function readlinead(li: ？
-	-): number { 
+	export function readlinead(li: linechooseAD): number { 
 	     let values = i2cRead(N76E003AT20_ADDRESS, li);
 		 return values;
 
