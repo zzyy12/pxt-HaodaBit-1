@@ -483,70 +483,88 @@ namespace HaodaBit {
     }
 	
 
+			/***/
+	//% blockId=oled_init_terminal
+    //% weight=100
+    //% block="initialize OLED with height %height|width %width"
+    //% shim=OLED::init_terminal
+	//% group="显示" blockGap=8
 	
-	
-	//% blockId=HaodaBit_mp3_connect block="MP3 init|port %port"
-    //% weight=39
-	//% group="音乐" blockGap=8
-	
-    export function MP3Connect(port: Ports): void {
-        let pin = PortSerial[port]
-        // todo: fiber may freeze on steam reading
-        serial.redirect(pin, SerialPin.P16, BaudRate.BaudRate9600)
+    export function init(height: number = 64, width: number = 128): void {
+        return;
     }
 
-    //% blockId=HaodaBit_mp3_play block="MP3 |%pn"
-	//% weight=39
-    //% group="音乐" blockGap=8
-    export function MP3Play(pn: PrevNext): void {
-        let buf = pins.createBuffer(8);
-        buf[0] = 0x7e;
-        buf[1] = 0xFF;
-        buf[2] = 0X06;
-        buf[3] = pn;
-        buf[4] = 0x00;
-        buf[5] = 0x00;
-        buf[6] = 0x00;
-        buf[7] = 0xef;
-        serial.writeBuffer(buf)
+    /**
+     *Prints Next Line
+     */
+    //% blockId=oled_next_line
+    //% block="insert newline"
+    //% async
+    //% shim=OLED::NextLine
+	//% group="显示" blockGap=8
+    export function nextLine(): void {
+        return;
     }
 
-    //% blockId=HaodaBit_mp3_volumn block="MP3_volume_set|%volumn"
-    //% volumn.min=0 volumn.max=30
-    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-    //% weight=39
-    //% group="音乐" blockGap=8
-    export function MP3Volumn(volumn: number): void {
-        let buf = pins.createBuffer(8);
-        buf[0] = 0x7e;
-        buf[1] = 0xff;
-        buf[2] = 0x06;
-        buf[3] = 0x06;
-        buf[4] = 0x00;
-        buf[5] = 0x00;
-        buf[6] = volumn;
-        buf[7] = 0xef;
-        serial.writeBuffer(buf)
-    }
 
-    //% blockId=HaodaBit_mp3_playindex block="MP3 play|index %index"
-    //% weight=39
-    //% group="音乐" blockGap=8
-    export function MP3PlayIndex(index: number): void {
-        let buf = pins.createBuffer(8);
-        if (index == 0) {
-            index = 1;
-        }
-        buf[0] = 0x7e;
-        buf[1] = 0xff;
-        buf[2] = 0x06;
-        buf[3] = 0x12;
-        buf[4] = 0x00;
-        buf[5] = 0x00;
-        buf[6] = index;
-        buf[7] = 0xef;
-        serial.writeBuffer(buf)
+    /**
+     * clears the screen.
+     */
+    //% blockId=oled_clear_screen
+    //% block="clear OLED display"
+    //% icon="\uf1ec" 
+    //% shim=OLED::clearDisplay
+	//% group="显示" blockGap=8
+    export function clear(): void {
+        return;
     }
+     /**
+      * prints a string on the OLED display
+      * @param text text to display, eg: "Hello, OLED!"
+      */
+     //% weight=92 blockGap=8
+     //% block="show|string %text" 
+     //% async
+     //% blockId=oled_print_stringNoNewLine
+     //% icon="\uf1ec"
+     //% shim=OLED::showStringNoNewLine
+	 //% group="显示" blockGap=8
+     export function showStringNoNewLine(text: string): void {
+        console.log("display: " + text);
+        return;
+    }
+     /**
+      * prints a string on the OLED display
+      * @param text text to display, eg: "Hello, OLED!"
+      
+     //% weight=94 blockGap=8
+     //% block="show|string %text" 
+     //% async
+     //% blockId=oled_print_stringWithNewLine
+     //% icon="\uf1ec"
+     //% shim=OLED::showStringWithNewLine
+	 //% group="OLED" blockGap=8
+     export function showStringWithNewLine(text: string): void {
+        console.log("display: " + text);
+        return;
+    }*/
+
+    /**
+     * prints a number on tthe OLED display without a newline
+     * @param number number o display 
+     */
+    //% weight=93
+    //% blockId=oled_print_number
+    //% block="show|number %number" 
+    //% async 
+    //% shim=OLED::showNumberWithoutNewLine
+	//% group="显示" blockGap=8
+    export function showNumberNoNewLine(number: number): void {
+        console.log("display: " + number);
+        return;
+    }
+	
+	
 	
 	//% blockId=HaodaBit_motor_servo block="Servo|%pin|degree|%degree"
     //% weight=100 blockGap=8
