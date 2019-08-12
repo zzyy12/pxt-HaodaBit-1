@@ -635,8 +635,8 @@ namespace HaodaBit {
 
         let port = PortAnalog[pin]
 
-        /*let value = (0.5 + degree / 90) * 1000*/
-        pins.servoWritePin(port, degree)
+        let value = (0.5 + degree / 90) * 1000
+        pins.servoSetPulse(port, value)
     }
 	
 	//% blockId=HaodaBit_LM35_server block="read lm35|port %pin"
