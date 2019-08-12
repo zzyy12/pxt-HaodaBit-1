@@ -17,8 +17,7 @@
         "ReceiverIR.h",
         "RemoteIR.h",
 		"TransmitterIR.cpp",
-        "TransmitterIR.h",
-        "_locales/zh/HaodaBit-strings.json"
+        "TransmitterIR.h"
     ],
     "testFiles": [
         "test.ts"
