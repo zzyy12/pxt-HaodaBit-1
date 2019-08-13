@@ -303,35 +303,123 @@ namespace HaodaBit {
 
 
 
-    //% blockId=HaodaBit_ultrasonic block="Ultrasonic|port %pin"
-    //% weight=10
-    //% group="传感器" blockGap=8
-    export function Ultrasonic(pin: Ports): number {
-
-        // send pulse
-        let port = PortDigital[pin]
-
-        pins.setPull(port, PinPullMode.PullNone);
-        pins.digitalWritePin(port, 0);
-        control.waitMicros(2);
-        pins.digitalWritePin(port, 1);
-        control.waitMicros(10);
-        pins.digitalWritePin(port, 0);
-
-        // read pulse
-        let d = pins.pulseIn(port, PulseValue.High, 23000);
-        let ret = d;
-        // filter timeout spikes
-        if (ret == 0 && distanceBuf != 0) {
-            ret = distanceBuf;
-        }
-        distanceBuf = d;
-
-        return Math.floor(ret * 10 / 6 / 58);
+   
+	
+	
+	   /**
+     *  set the IR receiver pin.
+     */
+    //% blockId=setREC_pin block="set IR receiver pin: %myPin" 
+    //% weight=85 
+	//% group="红外" blockGap=8
+    export function setREC_pin(myPin: Ports) {
+		let portaa = PortDigital[myPin]
+        recPin = portaa;
+        pins.setEvents(recPin, PinEventType.Pulse)
+        pins.setPull(recPin, PinPullMode.PullUp)
+        pins.onPulsed(recPin, PulseValue.Low, function () {
+            arr.push(input.runningTimeMicros())
+        })
+        pins.onPulsed(recPin, PulseValue.High, function () {
+            arr.push(input.runningTimeMicros())
+        })
+        control.onEvent(recPin, DAL.MICROBIT_PIN_EVENT_ON_TOUCH, tempHandler);
+        rec_init = true;
     }
 	
-	
-	   
+	 function resetReceiver() {
+        arr = []
+        received = false
+    }
+
+    control.inBackground(function () {
+        basic.forever(function () {
+            if ((!received) && (rec_init)) {
+                if (arr.length > 20) {
+                    if ((input.runningTimeMicros() - arr[arr.length - 1]) > 120000) {
+                        if (first) {
+                            resetReceiver()
+                            first = false
+                        } else {
+                            received = true
+                            decodeIR();
+                        }
+                    }
+                }
+            }
+        })
+    })
+
+    function decodeIR() {
+        let addr = 0
+        let command = 0
+        messageStr = ""
+        rec_Type = ""
+        for (let i = 0; i <= arr.length - 1 - 1; i++) {
+            arr[i] = arr[i + 1] - arr[i]
+        }
+        if (((arr[0] + arr[1]) > 13000) && ((arr[0] + arr[1]) < 14000)) {
+            rec_Type = "NEC"
+            arr.removeAt(1)
+            arr.removeAt(0)
+            addr = pulseToDigit(0, 15, 1600)
+            command = pulseToDigit(16, 31, 1600)
+            command1 = command & 0x00ff
+
+            arr = [];
+            if (thereIsHandler) {
+                tempHandler();
+            }
+        } else if (((arr[0] + arr[1]) > 2600) && ((arr[0] + arr[1]) < 3200)) {
+            rec_Type = "SONY"
+            arr.removeAt(1)
+            arr.removeAt(0)
+            command = pulseToDigit(0, 11, 1300)
+            command1 = command & 0x00ff
+            arr = [];
+            if (thereIsHandler) {
+                tempHandler();
+            }
+        }
+        resetReceiver();
+    }
+
+    function pulseToDigit(beginBit: number, endBit: number, duration: number): number {
+        let myNum = 0
+        for (let i = beginBit; i <= endBit; i++) {
+            myNum <<= 1
+            if ((arr[i * 2] + arr[i * 2 + 1]) < duration) {
+                myNum += 0
+            } else {
+                myNum += 1
+            }
+        }
+        return myNum
+    }
+
+
+    /**
+     * Do something when a receive IR
+     */
+    //% blockId=onReceivedIR block="on IR message received" blockInlineInputs=true
+    //% weight=70 
+	//% group="红外" blockGap=8
+    export function onReceivedIR(handler: Action): void {
+        tempHandler = handler
+        thereIsHandler = true
+    }
+
+
+    /**
+     * return the message of the received IR 
+     */
+    //% blockId=getMessage block="read IR"
+    //% weight=60 
+	//% group="红外" blockGap=8
+    export function getMessage(): number {
+
+        return command1
+    }
 	
 
     //% blockId=IR_KEY block="IR buttons| %readkey"
