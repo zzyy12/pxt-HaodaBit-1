@@ -456,31 +456,7 @@ namespace HaodaBit {
 	
 
 	
-	//% blockId=HaodaBit_dht11 block="DHT11|port %port|type %readtype"
-    //% weight=60
-    //% group="传感器" blockGap=8
-    export function DHT11(readtype: DHT11Type, port: Ports1): number {
 
-        let pin = PortDigital[port]
-
-        // todo: get pinname in ts
-        let value = (dht11Update(pin - 7) >> 0)
-
-
-        if (value != 0) {
-            dht11Temp = (value & 0x0000ff00) >> 8;
-            dht11Humi = value >> 24;
-        }
-        if (readtype == DHT11Type.TemperatureC) {
-            return dht11Temp;
-        } else if (readtype == DHT11Type.TemperatureF) {
-            return Math.floor(dht11Temp * 9 / 5) + 32;
-        } else {
-            return dht11Humi;
-        }
-
-
-    }
 	
 
 			/***/
@@ -627,7 +603,30 @@ namespace HaodaBit {
         serial.writeBuffer(buf)
     }
 	
+	
+	//% blockId=HaodaBit_motor_servo block="Servo|%pin|degree|%degree"
+    //% weight=100 blockGap=8
+    //% degree.min=0 degree.max=180
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+	
+    export function servo(pin: Ports, degree: number): void {
 
+        let port = PortAnalog[pin]
+
+        let value = (0.5 + degree / 90) * 1000
+        pins.servoSetPulse(port, value)
+    }
+	
+	//% blockId=HaodaBit_LM35_server block="read lm35|port %pin"
+    //% weight=100
+    //% group="传感器" blockGap=8
+    export function server_lm35(pin: Ports1): number {
+
+        let port = PortAnalog[pin]
+        let vas = pins.analogReadPin(port)
+        let value = (82.5 * vas) >> 8
+        return value;
+    }
 	
 	
 	function TCS34725_setIntegrationTime() {
