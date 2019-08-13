@@ -835,121 +835,99 @@ namespace HaodaBit {
     }
 	
 	
-	function setreg(reg: number, dat: number): void {
-        let buf = pins.createBuffer(2);
-        buf[0] = reg;
-        buf[1] = dat;
-        pins.i2cWriteBuffer(BMP280_I2C_ADDR, buf);
+	
+	
+	
+	function MM32DDDD(): void {
+        i2cWrite(MM32_ADDRESS, MODE1, 0x00)
+        setFreq(50);
+        initialized = true
     }
 
-    function getreg(reg: number): number {
-        pins.i2cWriteNumber(BMP280_I2C_ADDR, reg, NumberFormat.UInt8BE);
-        return pins.i2cReadNumber(BMP280_I2C_ADDR, NumberFormat.UInt8BE);
+
+
+    function setFreq(freq: number): void {
+        // Constrain the frequency
+        let prescaleval = 25000000;
+        prescaleval /= 4096;
+        prescaleval /= freq;
+        prescaleval -= 1;
+        let prescale = prescaleval;//Math.floor(prescaleval + 0.5);
+        let oldmode = i2cRead(MM32_ADDRESS, MODE1);
+        let newmode = (oldmode & 0x7F) | 0x10; // sleep
+        i2cWrite(MM32_ADDRESS, MODE1, newmode); // go to sleep
+        i2cWrite(MM32_ADDRESS, PRESCALE, prescale); // set the prescaler
+        i2cWrite(MM32_ADDRESS, MODE1, oldmode);
+        control.waitMicros(5000);
+        i2cWrite(MM32_ADDRESS, MODE1, oldmode | 0xa1);
     }
 
-    function getUInt16LE(reg: number): number {
-        pins.i2cWriteNumber(BMP280_I2C_ADDR, reg, NumberFormat.UInt8BE);
-        return pins.i2cReadNumber(BMP280_I2C_ADDR, NumberFormat.UInt16LE);
-    }
+    function setPwm(channel: number, on: number, off: number): void {
+        if (channel < 0 || channel > 15)
+            return;
 
-    function getInt16LE(reg: number): number {
-        pins.i2cWriteNumber(BMP280_I2C_ADDR, reg, NumberFormat.UInt8BE);
-        return pins.i2cReadNumber(BMP280_I2C_ADDR, NumberFormat.Int16LE);
-    }
-
-    let dig_T1 = getUInt16LE(0x88)
-    let dig_T2 = getInt16LE(0x8A)
-    let dig_T3 = getInt16LE(0x8C)
-    let dig_P1 = getUInt16LE(0x8E)
-    let dig_P2 = getInt16LE(0x90)
-    let dig_P3 = getInt16LE(0x92)
-    let dig_P4 = getInt16LE(0x94)
-    let dig_P5 = getInt16LE(0x96)
-    let dig_P6 = getInt16LE(0x98)
-    let dig_P7 = getInt16LE(0x9A)
-    let dig_P8 = getInt16LE(0x9C)
-    let dig_P9 = getInt16LE(0x9E)
-    setreg(0xF4, 0x2F)
-    setreg(0xF5, 0x0C)
-    let T = 0
-    let P = 0
-
-    function get(): void {
-        let adc_T = (getreg(0xFA) << 12) + (getreg(0xFB) << 4) + (getreg(0xFC) >> 4)
-        let var1 = (((adc_T >> 3) - (dig_T1 << 1)) * dig_T2) >> 11
-        let var2 = (((((adc_T >> 4) - dig_T1) * ((adc_T >> 4) - dig_T1)) >> 12) * dig_T3) >> 14
-        let t = var1 + var2
-        T = Math.idiv(((t * 5 + 128) >> 8), 100)
-        var1 = (t >> 1) - 64000
-        var2 = (((var1 >> 2) * (var1 >> 2)) >> 11) * dig_P6
-        var2 = var2 + ((var1 * dig_P5) << 1)
-        var2 = (var2 >> 2) + (dig_P4 << 16)
-        var1 = (((dig_P3 * ((var1 >> 2) * (var1 >> 2)) >> 13) >> 3) + (((dig_P2) * var1) >> 1)) >> 18
-        var1 = ((32768 + var1) * dig_P1) >> 15
-        if (var1 == 0)
-            return; // avoid exception caused by division by zero
-        let adc_P = (getreg(0xF7) << 12) + (getreg(0xF8) << 4) + (getreg(0xF9) >> 4)
-        let _p = ((1048576 - adc_P) - (var2 >> 12)) * 3125
-        _p = Math.idiv(_p, var1) * 2;
-        var1 = (dig_P9 * (((_p >> 3) * (_p >> 3)) >> 13)) >> 12
-        var2 = (((_p >> 2)) * dig_P8) >> 13
-        P = _p + ((var1 + var2 + dig_P7) >> 4)
+        let buf = pins.createBuffer(5);
+        buf[0] = LED0_ON_L + 4 * channel;
+        buf[1] = on & 0xff;
+        buf[2] = (on >> 8) & 0xff;
+        buf[3] = off & 0xff;
+        buf[4] = (off >> 8) & 0xff;
+        pins.i2cWriteBuffer(MM32_ADDRESS, buf);
     }
 
     /**
-     * get pressure
+     * Runs the motor at the given speed
      */
-    //% blockId="BMP280_GET_PRESSURE" block="BMP280 get pressure"
-    //% weight=80
-	//% group="传感器" blockGap=8
-    export function pressure(): number {
-        get();
-        return P;
+    //% weight=90 blockGap=8
+    //% blockId=HaodaBit_MotorRun block="Motor|%index|dir|%Dir|speed|%speed"
+    //% speed.min=0 speed.max=255
+    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2
+    //% direction.fieldEditor="gridpicker" direction.fieldOptions.columns=2
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function MotorRun(index: Motors, direction: Dir, speed: number): void {
+        if (!initialized) {
+            MM32DDDD()
+        }
+        speed = speed * 16 * direction; // map 255 to 4096
+        if (speed >= 4096) {
+            speed = 4095
+        }
+        if (speed <= -4096) {
+            speed = -4095
+        }
+        if (index > 4 || index <= 0)
+            return
+        let pn = (4 - index) * 2
+        let pp = (4 - index) * 2 + 1
+        if (speed >= 0) {
+            setPwm(pp, 0, speed)
+            setPwm(pn, 0, 0)
+        } else {
+            setPwm(pp, 0, 0)
+            setPwm(pn, 0, -speed)
+        }
+    }
+
+    //% weight=20 blockGap=8
+    //% blockId=HaodaBit_motorStop block="Motor stop|%index"
+    //% index.fieldEditor="gridpicker" index.fieldOptions.columns=2 
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function motorStop(index: Motors) {
+        setPwm((4 - index) * 2, 0, 0);
+        setPwm((4 - index) * 2 + 1, 0, 0);
     }
 
     /**
-     * get temperature
+    * Stop all motors
     */
-    //% blockId="BMP280_GET_TEMPERATURE" block="BMP280 get temperature"
-    //% weight=80
-	//% group="传感器" blockGap=8
-    export function temperature(): number {
-        get();
-        return T;
-    } 
-
-    /**
-     * power on
-    */
-    //% blockId="BMP280_POWER_ON" block="BMP280 power On"
-    //% weight=80 
-	//% group="传感器" blockGap=8
-    export function PowerOn() {
-        setreg(0xF4, 0x2F)
-    } 
-
-    /**
-     * power off
-     */
-    //% blockId="BMP280_POWER_OFF" block="BMP280 power Off"
-    //% weight=80 
-	//% group="传感器" blockGap=8
-    export function PowerOff() {
-        setreg(0xF4, 0)
+    //% weight=10 blockGap=8
+    //% blockId=HaodaBit_motorStopAll block="Motor Stop All"
+    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    export function motorStopAll(): void {
+        for (let idx = 1; idx <= 2; idx++) {
+            motorStop(idx);
+        }
     }
-
-    /**
-     * set I2C address
-     */
-    //% blockId="BMP280_SET_ADDRESS" block="BMP280 set address %addr"
-    //% weight=80
-	//% group="传感器" blockGap=8
-    export function Address(addr: BMP280_I2C_ADDRESS) {
-        BMP280_I2C_ADDR = addr
-    }
-	
-	
-	
 	
 	//% blockId="HaodaBit_set_height" block="set Tracer|%pn|height|%heights"
     //% weight=90
