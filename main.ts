@@ -653,101 +653,95 @@ namespace HaodaBit {
     }
 	
 	
-	function TCS34725_setIntegrationTime() {
-        if (!tcs34725Initialised) { TCS34725_begin(); }
-
-        /* Update the timing register */
-        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x01, TCS34725IntegrationTime & 0xFF);
-
-    }
-
-
-    function TCS34725_setGain() {
-        if (!tcs34725Initialised) { TCS34725_begin(); }
-
-        /* Update the timing register */
-        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x0F, TCS34725Gain & 0xFF);
-
-    }
-    function TCS34725_enable(): void {
-
-        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00, 0x01 & 0xFF);
-        basic.pause(3);
-        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00, (0x01 | 0x02) & 0xFF);
-    }
-    function TCS34725_begin(): boolean {
-
-        //i2cWrite(TCS34725_ADDRESS, 0x00, 0x00 & 0xFF);
-
-        /* Make sure we're actually connected */
-        let x = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x12);
-
-        if ((x != 0x44) && (x != 0x10)) {
-            return false;
-        }
-        tcs34725Initialised = true;
-
-        /* Set default integration time and gain */
-        TCS34725_setIntegrationTime();
-        TCS34725_setGain();
-
-        /* Note: by default, the device is in power down mode on bootup */
-        TCS34725_enable();
-
-        return true;
-    }
-
-
-
-    function TCS34725_LOCK(): void {
-        let r = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00);
-        r |= 0x10;
-        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00, r & 0xFF);
-    }
-
-    function TCS34725_readRGBC(a: number): number {
-
-        if (!tcs34725Initialised) { TCS34725_begin(); }
-
-        let clear = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x14);
-        let red = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x16);
-        let green = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x18);
-        let blue = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x1A);
-        basic.pause(50);
-        TCS34725_LOCK();
-        let sum = clear;
-        let r = red;
-        r /= sum;
-        let g = green;
-        g /= sum;
-        let b = blue;
-        b /= sum;
-        r *= 256;
-        g *= 256;
-        b *= 256;
-        if (a == 0) {
-            return Math.round(r);
-        } else if (a == 1) {
-            return Math.round(g);
-        } else if (a == 2) {
-            return Math.round(b);
-        } else {
-            return 0;
-        }
+	
+	
+	
+    function transmitBit(highTime: number, lowTime: number): void {
+        pins.analogWritePin(irLed, 512);
+        control.waitMicros(highTime);
+        pins.analogWritePin(irLed, 0);
+        control.waitMicros(lowTime);
     }
 	
+	
+
+    function encode(myCode: number, bits: number, trueHigh: number, trueLow: number, falseHigh: number, falseLow: number): void {
+        const MESSAGE_BITS = bits;
+        for (let mask = 1 << (MESSAGE_BITS - 1); mask > 0; mask >>= 1) {
+            if (myCode & mask) {
+                transmitBit(trueHigh, trueLow);
+            } else {
+                transmitBit(falseHigh, falseLow);
+            }
+        }
+    }
+
+    function sendNEC(message: number, times: number): void {
+        const enum NEC {
+            startHigh = 9000,
+            startLow = 4500,
+            stopHigh = 560,
+            stopLow = 0,
+            trueHigh = 560,
+            trueLow = 1690,
+            falseHigh = 560,
+            falseLow = 560,
+            interval = 110000
+        }
+        let address = message >> 16;
+        let command = message % 0x010000;
+        const MESSAGE_BITS = 16;
+        let startTime = 0;
+        let betweenTime = 0;
+        for (let sendCount = 0; sendCount < times; sendCount++) {
+            startTime = input.runningTimeMicros();
+            transmitBit(NEC.startHigh, NEC.startLow);
+            encode(address, 16, NEC.trueHigh, NEC.trueLow, NEC.falseHigh, NEC.falseLow);
+            encode(command, 16, NEC.trueHigh, NEC.trueLow, NEC.falseHigh, NEC.falseLow);
+            transmitBit(NEC.stopHigh, NEC.stopLow);
+            betweenTime = input.runningTimeMicros() - startTime
+            if (times > 0)
+                control.waitMicros(NEC.interval - betweenTime);
+        }
+    }
 
 
-    //% blockId=HaodaBit_TCS34725 block="read color|port %pn"
+
+    export function sendMessage(message: number, times: number, myType: encodingType): void {
+        switch (myType) {
+            case encodingType.NEC: sendNEC(message, times);
+            default: sendNEC(message, times);
+        }
+    }
+	    
+    /**
+     *  set the infrared LED pin.
+     */
+    //% blockId=setIR_pin block="set IR LED pin: %port" 
+    //% weight=90 
+	//% group="红外" blockGap=8
+
+    export function setIR_pin(port: Ports) {
+		let portss = PortAnalog[port]
+        irLed = portss;
+        pins.analogWritePin(irLed, 0);
+        pins.analogSetPeriod(irLed, pwmPeriod);
+        send_init = true;
+    }
+	
+	 /**
+     * send message from IR LED. You must set the message encoding type, send how many times, and the message.
+     */
+    //% blockId=HaodaBit_sendMyMessage block="IR send message at: %msg"
     //% weight=100
-    //% group="传感器" blockGap=8
-    export function H_TCS34725(pn: Creadcolor): number {
-        let num = TCS34725_readRGBC(pn);
-        return num;
+	//% group="红外" blockGap=8
+  export function sendMyMessage(msg: number): void {
+        if (send_init) {
+            //control.inBackground(() => {
+                sendMessage(msg, 1, encodingType.NEC);
+            //})
+        }
     }
-	
-	
-
 	
 	
 	function setreg(reg: number, dat: number): void {
