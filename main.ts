@@ -113,15 +113,7 @@ namespace HaodaBit {
 
 
     }
-    const Ports2 = [
-        Pins.P0,
-        Pins.P1,
-        Pins.P2,
-        Pins.P8,
-        Pins.P12,
-        Pins.P16
 
-    ]
 	
 	export enum DHT11Type {
         //% block=temperature(°C)
