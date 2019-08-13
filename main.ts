@@ -303,7 +303,32 @@ namespace HaodaBit {
 
 
 
-   
+    //% blockId=HaodaBit_ultrasonic block="Ultrasonic|port %pin"
+    //% weight=10
+    //% group="传感器" blockGap=8
+    export function Ultrasonic(pin: Ports): number {
+
+        // send pulse
+        let port = PortDigital[pin]
+
+        pins.setPull(port, PinPullMode.PullNone);
+        pins.digitalWritePin(port, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(port, 1);
+        control.waitMicros(10);
+        pins.digitalWritePin(port, 0);
+
+        // read pulse
+        let d = pins.pulseIn(port, PulseValue.High, 23000);
+        let ret = d;
+        // filter timeout spikes
+        if (ret == 0 && distanceBuf != 0) {
+            ret = distanceBuf;
+        }
+        distanceBuf = d;
+
+        return Math.floor(ret * 10 / 6 / 58);
+    }
 	
 	
 	   /**
