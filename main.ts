@@ -564,6 +564,68 @@ namespace HaodaBit {
         return;
     }
 	
+	//% blockId=HaodaBit_mp3_connect block="MP3 init|port %port"
+    //% weight=39
+	//% group="音乐" blockGap=8
+	
+    export function MP3Connect(port: Ports): void {
+        let pin = PortSerial[port]
+        // todo: fiber may freeze on steam reading
+        serial.redirect(pin, SerialPin.P16, BaudRate.BaudRate9600)
+    }
+
+    //% blockId=HaodaBit_mp3_play block="MP3 |%pn"
+	//% weight=39
+    //% group="音乐" blockGap=8
+    export function MP3Play(pn: PrevNext): void {
+        let buf = pins.createBuffer(8);
+        buf[0] = 0x7e;
+        buf[1] = 0xFF;
+        buf[2] = 0X06;
+        buf[3] = pn;
+        buf[4] = 0x00;
+        buf[5] = 0x00;
+        buf[6] = 0x00;
+        buf[7] = 0xef;
+        serial.writeBuffer(buf)
+    }
+
+    //% blockId=HaodaBit_mp3_volumn block="MP3_volume_set|%volumn"
+    //% volumn.min=0 volumn.max=30
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% weight=39
+    //% group="音乐" blockGap=8
+    export function MP3Volumn(volumn: number): void {
+        let buf = pins.createBuffer(8);
+        buf[0] = 0x7e;
+        buf[1] = 0xff;
+        buf[2] = 0x06;
+        buf[3] = 0x06;
+        buf[4] = 0x00;
+        buf[5] = 0x00;
+        buf[6] = volumn;
+        buf[7] = 0xef;
+        serial.writeBuffer(buf)
+    }
+
+    //% blockId=HaodaBit_mp3_playindex block="MP3 play|index %index"
+    //% weight=39
+    //% group="音乐" blockGap=8
+    export function MP3PlayIndex(index: number): void {
+        let buf = pins.createBuffer(8);
+        if (index == 0) {
+            index = 1;
+        }
+        buf[0] = 0x7e;
+        buf[1] = 0xff;
+        buf[2] = 0x06;
+        buf[3] = 0x12;
+        buf[4] = 0x00;
+        buf[5] = 0x00;
+        buf[6] = index;
+        buf[7] = 0xef;
+        serial.writeBuffer(buf)
+    }
 	
 	
 	//% blockId=HaodaBit_motor_servo block="Servo|%pin|degree|%degree"
@@ -979,56 +1041,6 @@ namespace HaodaBit {
     }
 	
 	
-	//% blockId="HaodaBit_set_height" block="set Tracer|%pn|height|%heights"
-    //% weight=90
-    //% group="传感器" blockGap=8
-    export function Lineheight(pn: linechoosedb, heights: number): void {
-		
-		
-/**	
-		
-		
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x03, N76E003AT20_DATA1, N76E003AT20_DATA2);
-		
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x05, N76E003AT20_DATA1, N76E003AT20_DATA2);
 
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x07, N76E003AT20_DATA1, N76E003AT20_DATA2);
-
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x09, N76E003AT20_DATA1, N76E003AT20_DATA2);
-
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x13, N76E003AT20_DATA1, N76E003AT20_DATA2);
-
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x14, N76E003AT20_DATA1, N76E003AT20_DATA2);
-
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x19, N76E003AT20_DATA1, N76E003AT20_DATA2);
-
-		i2cWrite_1(N76E003AT20_ADDRESS, 0x16, N76E003AT20_DATA1, N76E003AT20_DATA2);
-*/
-		
-	
-	
-		i2cWrite(N76E003AT20_ADDRESS, pn, heights);
-
-
-
-    }
-	
-	//% blockId="HaodaBit_read_linead" block="read Tracer|%li|touch black"
-    //% weight=90
-    //% group="传感器" blockGap=8
-	export function readlinead(li: linechooseAD): number { 
-	     let values = i2cRead(N76E003AT20_ADDRESS, li);
-		 return values;
-
-	}
-	
-	//% blockId="HaodaBit_read_line" block="Tracer|%li|touch black or not"
-    //% weight=90
-    //% group="传感器" blockGap=8
-	export function readline(li: linechoose): number { 
-	     let values = i2cRead(N76E003AT20_ADDRESS, li);
-		 return values;
-
-	}
 
 }
