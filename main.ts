@@ -627,33 +627,101 @@ namespace HaodaBit {
         serial.writeBuffer(buf)
     }
 	
-	
-	//% blockId=HaodaBit_motor_servo block="Servo|%pin|degree|%degree"
-    //% weight=100 blockGap=8
-    //% degree.min=0 degree.max=180
-    //% group="执行" name.fieldEditor="gridpicker" name.fieldOptions.columns=4
-	
-    export function servo(pin: Ports, degree: number): void {
 
-        let port = PortAnalog[pin]
+	
+	
+	function TCS34725_setIntegrationTime() {
+        if (!tcs34725Initialised) { TCS34725_begin(); }
 
-        let value = (0.5 + degree / 90) * 1000
-        pins.servoSetPulse(port, value)
+        /* Update the timing register */
+        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x01, TCS34725IntegrationTime & 0xFF);
+
+    }
+
+
+    function TCS34725_setGain() {
+        if (!tcs34725Initialised) { TCS34725_begin(); }
+
+        /* Update the timing register */
+        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x0F, TCS34725Gain & 0xFF);
+
+    }
+    function TCS34725_enable(): void {
+
+        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00, 0x01 & 0xFF);
+        basic.pause(3);
+        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00, (0x01 | 0x02) & 0xFF);
+    }
+    function TCS34725_begin(): boolean {
+
+        //i2cWrite(TCS34725_ADDRESS, 0x00, 0x00 & 0xFF);
+
+        /* Make sure we're actually connected */
+        let x = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x12);
+
+        if ((x != 0x44) && (x != 0x10)) {
+            return false;
+        }
+        tcs34725Initialised = true;
+
+        /* Set default integration time and gain */
+        TCS34725_setIntegrationTime();
+        TCS34725_setGain();
+
+        /* Note: by default, the device is in power down mode on bootup */
+        TCS34725_enable();
+
+        return true;
+    }
+
+
+
+    function TCS34725_LOCK(): void {
+        let r = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00);
+        r |= 0x10;
+        i2cWrite(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x00, r & 0xFF);
+    }
+
+    function TCS34725_readRGBC(a: number): number {
+
+        if (!tcs34725Initialised) { TCS34725_begin(); }
+
+        let clear = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x14);
+        let red = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x16);
+        let green = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x18);
+        let blue = i2cRead(TCS34725_ADDRESS, TCS34725_COMMAND_BIT | 0x1A);
+        basic.pause(50);
+        TCS34725_LOCK();
+        let sum = clear;
+        let r = red;
+        r /= sum;
+        let g = green;
+        g /= sum;
+        let b = blue;
+        b /= sum;
+        r *= 256;
+        g *= 256;
+        b *= 256;
+        if (a == 0) {
+            return Math.round(r);
+        } else if (a == 1) {
+            return Math.round(g);
+        } else if (a == 2) {
+            return Math.round(b);
+        } else {
+            return 0;
+        }
     }
 	
-	//% blockId=HaodaBit_LM35_server block="read lm35|port %pin"
+
+
+    //% blockId=HaodaBit_TCS34725 block="read color|port %pn"
     //% weight=100
     //% group="传感器" blockGap=8
-    export function server_lm35(pin: Ports1): number {
-
-        let port = PortAnalog[pin]
-        let vas = pins.analogReadPin(port)
-        let value = (82.5 * vas) >> 8
-        return value;
+    export function H_TCS34725(pn: Creadcolor): number {
+        let num = TCS34725_readRGBC(pn);
+        return num;
     }
-	
-	
-	
 	
 	
     function transmitBit(highTime: number, lowTime: number): void {
